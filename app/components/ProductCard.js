@@ -1,23 +1,48 @@
 import Image from "next/image";
 import Link from "next/link";
+import Rating from "./Rating";
+import { useShoppingCart, formatCurrencyString } from "use-shopping-cart";
+import toast from "react-hot-toast";
 
 export default function ProductCard({ product }) {
+  const { addItem } = useShoppingCart();
+
+  function onAddToCart(e) {
+    e.preventDefault();
+    const id = toast.loading("Adding 1 itemm...");
+    addItem(product);
+    toast.success(`${product.name} added`, { id });
+  }
   return (
     <Link
       href={`/products/${product.id}`}
       className="border-2 rounded-md group overflow-hidden"
     >
       <div className="relative w-full h-64">
-        <Image src={product.image} alt={product.name} fill sizes={100} />
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          sizes={100}
+          style={{ objectFit: "contain" }}
+        />
       </div>
       <div className="p-6 bg-white">
         <p className="font-semibold text-lg">{product.name}</p>
+        <Rating />
         <div className="mt-4 flex items-center justify-between space-x-2">
           <div>
             <p className="text-gray-500">Price</p>
-            <p className="text-lg font-semibold">{product.price}</p>
+            <p className="text-lg font-semibold">
+              {formatCurrencyString({
+                value: product.price,
+                currency: product.currency,
+              })}
+            </p>
           </div>
-          <button className="border rounded-lg py-1 px-4">Add to Cart</button>
+          <button onClick={onAddToCart} className="border rounded-lg py-1 px-4">
+            Add to Cart
+          </button>
         </div>
       </div>
     </Link>
